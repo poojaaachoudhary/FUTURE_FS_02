@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mini CRM Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+display:flex;
+background:#f4f7fc;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+width:230px;
+background:#1e293b;
+color:white;
+height:100vh;
+padding:20px;
+position:fixed;
+}
+
+.sidebar h2{
+margin-bottom:30px;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.menu-btn{
+display:flex;
+align-items:center;
+gap:10px;
+width:100%;
+padding:12px;
+margin-bottom:10px;
+background:none;
+border:none;
+color:#cbd5e1;
+cursor:pointer;
+border-radius:8px;
+transition:0.3s;
+font-size:14px;
+text-align:left;
+}
+
+.menu-btn:hover{
+background:#334155;
+color:white;
+transform:translateX(4px);
+}
+
+.active-menu{
+background:#334155;
+color:white !important;
+border-left:4px solid #3b82f6;
+}
+
+.active-menu i{
+color:#3b82f6;
+}
+
+/* ================= MAIN ================= */
+
+.main{
+margin-left:230px;
+padding:30px;
+width:100%;
+}
+
+.section{display:none;}
+.active{display:block;}
+h1{margin-bottom:20px;}
+
+/* ================= DASHBOARD CARDS ================= */
+
+.cards{
+display:flex;
+gap:20px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.card{
+flex:1;
+min-width:200px;
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.card h3{font-size:14px;color:gray;}
+.card p{font-size:26px;font-weight:700;}
+.card i{font-size:30px;color:#3b82f6;}
+
+/* ================= TABLE ================= */
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+
+th, td{
+padding:12px;
+text-align:center;
+}
+
+th{background:#e2e8f0;}
+tr:nth-child(even){background:#f9fafb;}
+
+.badge{
+padding:5px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+color:white;
+}
+
+.new{background:#3b82f6;}
+.contacted{background:#f59e0b;}
+.converted{background:#10b981;}
+
+button.action{
+padding:6px 10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-size:12px;
+margin:2px;
+transition:0.2s;
+}
+
+.view{background:#6366f1;color:white;}
+.edit{background:#facc15;}
+.delete{background:#ef4444;color:white;}
+
+button.action:hover{
+transform:scale(1.05);
+}
+
+/* ================= FORM ================= */
+
+.form-box{
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+max-width:500px;
+}
+
+input, select, textarea{
+padding:8px;
+margin-bottom:10px;
+width:100%;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+.search-filter{
+display:flex;
+gap:10px;
+margin-bottom:15px;
+flex-wrap:wrap;
+}
+
+/* ================= MODALS ================= */
+
+.modal-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:1000;
+}
+
+.modal-box{
+background:white;
+width:420px;
+max-width:90%;
+padding:25px;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+animation:fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn{
+from{transform:scale(0.9);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
+
+.modal-box h3{margin-bottom:15px;}
+.modal-box p{margin-bottom:8px;font-size:14px;}
+
+.modal-actions{
+margin-top:20px;
+text-align:right;
+}
+
+.modal-btn{
+padding:6px 12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-size:13px;
+margin-left:8px;
+}
+
+.modal-close{background:#cbd5e1;}
+.modal-confirm{background:#ef4444;color:white;}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2><i class="fa-solid fa-chart-line"></i> Mini CRM</h2>
+
+<button class="menu-btn active-menu" onclick="showSection('dashboard', this)">
+<i class="fa-solid fa-gauge"></i> Dashboard
+</button>
+
+<button class="menu-btn" onclick="showSection('leads', this)">
+<i class="fa-solid fa-users"></i> Leads
+</button>
+
+<button class="menu-btn" onclick="showSection('addLead', this)">
+<i class="fa-solid fa-user-plus"></i> Add Lead
+</button>
+</div>
+
+<div class="main">
+
+<div id="dashboard" class="section active">
+<h1>Dashboard</h1>
+<div class="cards">
+<div class="card"><div><h3>Total Leads</h3><p id="totalLeads">0</p></div><i class="fa-solid fa-users"></i></div>
+<div class="card"><div><h3>New</h3><p id="newLeads">0</p></div><i class="fa-solid fa-user-plus"></i></div>
+<div class="card"><div><h3>Contacted</h3><p id="contactedLeads">0</p></div><i class="fa-solid fa-phone"></i></div>
+<div class="card"><div><h3>Converted</h3><p id="convertedLeads">0</p></div><i class="fa-solid fa-check"></i></div>
+</div>
+</div>
+
+<div id="leads" class="section">
+<h1>All Leads</h1>
+
+<div class="search-filter">
+<input type="text" id="search" placeholder="Search by name/email" onkeyup="searchLead()">
+<select id="filterStatus" onchange="filterStatus()">
+<option value="All">All Status</option>
+<option value="New">New</option>
+<option value="Contacted">Contacted</option>
+<option value="Converted">Converted</option>
+</select>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Status</th>
+<th>Follow-up</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="leadTable"></tbody>
+</table>
+</div>
+
+<div id="addLead" class="section">
+<h1>Add / Edit Lead</h1>
+<div class="form-box">
+<input type="text" id="name" placeholder="Name">
+<input type="email" id="email" placeholder="Email">
+<select id="status">
+<option>New</option>
+<option>Contacted</option>
+<option>Converted</option>
+</select>
+<input type="date" id="followup">
+<textarea id="notes" placeholder="Notes"></textarea>
+<button onclick="saveLead()">Save Lead</button>
+</div>
+</div>
+
+</div>
+
+<!-- VIEW MODAL -->
+<div id="viewModal" class="modal-overlay" onclick="outsideClick(event,'viewModal')">
+<div class="modal-box">
+<h3>Lead Details</h3>
+<div id="viewContent"></div>
+<div class="modal-actions">
+<button class="modal-btn modal-close" onclick="closeModal('viewModal')">Close</button>
+</div>
+</div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal-overlay" onclick="outsideClick(event,'deleteModal')">
+<div class="modal-box">
+<h3>Delete Lead</h3>
+<p>Are you sure you want to delete this lead?</p>
+<div class="modal-actions">
+<button class="modal-btn modal-close" onclick="closeModal('deleteModal')">Cancel</button>
+<button class="modal-btn modal-confirm" onclick="confirmDelete()">Delete</button>
+</div>
+</div>
+</div>
+
+<script>
+
+let leads = JSON.parse(localStorage.getItem("crmLeads")) || [];
+let editIndex = null;
+let deleteIndex = null;
+
+function showSection(id, element){
+document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+document.querySelectorAll(".menu-btn").forEach(btn=>btn.classList.remove("active-menu"));
+if(element){ element.classList.add("active-menu"); }
+updateDashboard();
+displayLeads();
+}
+
+function saveLead(){
+let name=nameInput.value||document.getElementById("name").value;
+let email=document.getElementById("email").value;
+let status=document.getElementById("status").value;
+let followup=document.getElementById("followup").value;
+let notes=document.getElementById("notes").value;
+
+if(!name||!email){ alert("Please fill required fields"); return; }
+
+if(editIndex===null){
+leads.push({name,email,status,followup,notes});
+}else{
+leads[editIndex]={name,email,status,followup,notes};
+editIndex=null;
+}
+
+localStorage.setItem("crmLeads",JSON.stringify(leads));
+clearForm();
+showSection("leads", document.querySelectorAll(".menu-btn")[1]);
+}
+
+function clearForm(){
+document.getElementById("name").value="";
+document.getElementById("email").value="";
+document.getElementById("followup").value="";
+document.getElementById("notes").value="";
+}
+
+function displayLeads(data=leads){
+let table=document.getElementById("leadTable");
+table.innerHTML="";
+data.forEach((lead,index)=>{
+table.innerHTML+=`
+<tr>
+<td>${lead.name}</td>
+<td>${lead.email}</td>
+<td><span class="badge ${lead.status.toLowerCase()}">${lead.status}</span></td>
+<td>${lead.followup||"-"}</td>
+<td>
+<button class="action view" onclick="viewLead(${index})">View</button>
+<button class="action edit" onclick="editLead(${index})">Edit</button>
+<button class="action delete" onclick="deleteLead(${index})">Delete</button>
+</td>
+</tr>`;
+});
+updateDashboard();
+}
+
+function viewLead(index){
+let lead=leads[index];
+document.getElementById("viewContent").innerHTML=`
+<p><strong>Name:</strong> ${lead.name}</p>
+<p><strong>Email:</strong> ${lead.email}</p>
+<p><strong>Status:</strong> ${lead.status}</p>
+<p><strong>Follow-up:</strong> ${lead.followup||"-"}</p>
+<p><strong>Notes:</strong> ${lead.notes||"-"}</p>`;
+document.getElementById("viewModal").style.display="flex";
+}
+
+function deleteLead(index){
+deleteIndex=index;
+document.getElementById("deleteModal").style.display="flex";
+}
+
+function confirmDelete(){
+leads.splice(deleteIndex,1);
+localStorage.setItem("crmLeads",JSON.stringify(leads));
+displayLeads();
+closeModal("deleteModal");
+}
+
+function closeModal(id){
+document.getElementById(id).style.display="none";
+}
+
+function outsideClick(event,id){
+if(event.target.id===id){ closeModal(id); }
+}
+
+document.addEventListener("keydown",function(e){
+if(e.key==="Escape"){
+closeModal("viewModal");
+closeModal("deleteModal");
+}
+});
+
+function editLead(index){
+let lead=leads[index];
+document.getElementById("name").value=lead.name;
+document.getElementById("email").value=lead.email;
+document.getElementById("status").value=lead.status;
+document.getElementById("followup").value=lead.followup;
+document.getElementById("notes").value=lead.notes;
+editIndex=index;
+showSection("addLead", document.querySelectorAll(".menu-btn")[2]);
+}
+
+function searchLead(){
+let value=document.getElementById("search").value.toLowerCase();
+displayLeads(leads.filter(l=>l.name.toLowerCase().includes(value)||l.email.toLowerCase().includes(value)));
+}
+
+function filterStatus(){
+let status=document.getElementById("filterStatus").value;
+if(status==="All"){ displayLeads(); }
+else{ displayLeads(leads.filter(l=>l.status===status)); }
+}
+
+function updateDashboard(){
+document.getElementById("totalLeads").innerText=leads.length;
+document.getElementById("newLeads").innerText=leads.filter(l=>l.status==="New").length;
+document.getElementById("contactedLeads").innerText=leads.filter(l=>l.status==="Contacted").length;
+document.getElementById("convertedLeads").innerText=leads.filter(l=>l.status==="Converted").length;
+}
+
+updateDashboard();
+displayLeads();
+
+</script>
+
+</body>
+</html>
